@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-const { nanoid } = require("nanoid");
+import { Schema, model } from "mongoose";
+import { nanoid } from "nanoid";
 
-const docGiaSchema = new mongoose.Schema(
+const docGiaSchema = new Schema(
 	{
 		MaDocGia: {
 			type: String,
@@ -53,7 +53,7 @@ const docGiaSchema = new mongoose.Schema(
 		Muon: [
 			{
 				MASACH: {
-					type: mongoose.Schema.Types.ObjectId,
+					type: Schema.Types.ObjectId,
 					ref: "Sach",
 				},
 				NGAYMUON: {
@@ -79,4 +79,4 @@ const docGiaSchema = new mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("DocGia", docGiaSchema);
+export default model("DocGia", docGiaSchema);

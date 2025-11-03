@@ -1,5 +1,5 @@
-const readerService = require("../services/reader.service");
-exports.registerReader = async (req, res) => {
+import readerService from "../services/reader.service";
+export async function registerReader(req, res) {
 	try {
 		const result = await readerService.register(req.body);
 		return res.status(201).json({
@@ -20,8 +20,8 @@ exports.registerReader = async (req, res) => {
 			error: error.message,
 		});
 	}
-};
-exports.loginReader = async (req, res) => {
+}
+export async function loginReader(req, res) {
 	try {
 		const result = await readerService.login(req.body);
 		return res.status(200).json({
@@ -42,9 +42,9 @@ exports.loginReader = async (req, res) => {
 			error: error.message,
 		});
 	}
-};
+}
 
-exports.getMyProfile = async (req, res) => {
+export async function getMyProfile(req, res) {
 	try {
 		const userId = req.userId;
 		console.log(userId);
@@ -62,8 +62,8 @@ exports.getMyProfile = async (req, res) => {
 			error: error.message,
 		});
 	}
-};
-exports.getUserProfile = async (req, res) => {
+}
+export async function getUserProfile(req, res) {
 	try {
 		const userId = req.params.id;
 		const reader = await readerService.getReaderById(userId);
@@ -80,8 +80,8 @@ exports.getUserProfile = async (req, res) => {
 			error: error.message,
 		});
 	}
-};
-exports.updateProfile = async (req, res) => {
+}
+export async function updateProfile(req, res) {
 	try {
 		const reader = await readerService.updateReader(req.userId, req.body);
 
@@ -96,8 +96,8 @@ exports.updateProfile = async (req, res) => {
 			message: error.message,
 		});
 	}
-};
-exports.deleteReader = async (req, res) => {
+}
+export async function deleteReader(req, res) {
 	try {
 		const result = await readerService.deleteReader(req.params.id);
 
@@ -111,8 +111,8 @@ exports.deleteReader = async (req, res) => {
 			message: error.message,
 		});
 	}
-};
-exports.getAllReaders = async (req, res) => {
+}
+export async function getAllReaders(req, res) {
 	try {
 		const filters = {
 			page: req.query.page,
@@ -133,4 +133,4 @@ exports.getAllReaders = async (req, res) => {
 			message: error.message,
 		});
 	}
-};
+}

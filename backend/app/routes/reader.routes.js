@@ -1,18 +1,26 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+const router = Router();
 
-const readerController = require("../controllers/reader.controller");
-const { authenticate } = require("../middleware/auth.middleware");
-const { isAdmin } = require("../middleware/admin.middleware");
+import {
+	registerReader,
+	loginReader,
+	getMyProfile,
+	getUserProfile,
+	updateProfile,
+	getAllReaders,
+	deleteReader,
+} from "../controllers/reader.controller";
+import { authenticate } from "../middleware/auth.middleware";
+import { isAdmin } from "../middleware/admin.middleware";
 
-router.post("/register", readerController.registerReader);
-router.post("/login", readerController.loginReader);
+router.post("/register", registerReader);
+router.post("/login", loginReader);
 
-router.get("/profile", authenticate, readerController.getMyProfile);
-router.get("/profile/:id", authenticate, readerController.getUserProfile);
-router.put("/profile", authenticate, readerController.updateProfile);
+router.get("/profile", authenticate, getMyProfile);
+router.get("/profile/:id", authenticate, getUserProfile);
+router.put("/profile", authenticate, updateProfile);
 
-router.get("/", authenticate, isAdmin, readerController.getAllReaders);
-router.delete("/:id", authenticate, isAdmin, readerController.deleteReader);
+router.get("/", authenticate, isAdmin, getAllReaders);
+router.delete("/:id", authenticate, isAdmin, deleteReader);
 
-module.exports = router;
+export default router;

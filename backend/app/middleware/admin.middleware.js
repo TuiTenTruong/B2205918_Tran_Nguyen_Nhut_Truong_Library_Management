@@ -1,6 +1,6 @@
-const NhanVien = require("../models/staff.model");
+import NhanVien from "../models/staff.model";
 
-exports.isAdmin = async (req, res, next) => {
+export async function isAdmin(req, res, next) {
 	try {
 		const staff = await NhanVien.findOne({
 			MSNV: req.userId,
@@ -28,4 +28,4 @@ exports.isAdmin = async (req, res, next) => {
 			error: error.message,
 		});
 	}
-};
+}

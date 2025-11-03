@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongodb");
+import { MongoClient } from "mongodb";
 
 class MongoDB {
 	static connect = async (uri) => {
@@ -8,4 +8,4 @@ class MongoDB {
 	};
 }
 
-module.exports = MongoDB;
+export default MongoDB;

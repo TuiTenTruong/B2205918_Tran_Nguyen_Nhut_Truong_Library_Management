@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const { nanoid } = require("nanoid");
-const nhanVienSchema = new mongoose.Schema(
+import { Schema, model } from "mongoose";
+import { nanoid } from "nanoid";
+const nhanVienSchema = new Schema(
 	{
 		MSNV: {
 			type: String,
@@ -49,4 +49,4 @@ const nhanVienSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
-module.exports = mongoose.model("NhanVien", nhanVienSchema);
+export default model("NhanVien", nhanVienSchema);

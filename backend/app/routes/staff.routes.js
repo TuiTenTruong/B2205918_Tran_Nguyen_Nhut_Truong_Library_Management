@@ -1,23 +1,26 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+const router = Router();
 
-const staffController = require("../controllers/staff.controller");
-const { authenticate } = require("../middleware/auth.middleware");
+import {
+	createStaffAccount,
+	loginAsStaff,
+	getMyProfile,
+	getUserProfile,
+	updateProfile,
+	deleteStaff,
+	getAllStaffs,
+} from "../controllers/staff.controller";
+import { authenticate } from "../middleware/auth.middleware";
 
-const { isAdmin } = require("../middleware/admin.middleware");
+import { isAdmin } from "../middleware/admin.middleware";
 
-router.post("/create", staffController.createStaffAccount);
-router.post("/login", staffController.loginAsStaff);
+router.post("/create", createStaffAccount);
+router.post("/login", loginAsStaff);
 
-router.get("/profile", authenticate, isAdmin, staffController.getMyProfile);
-router.get(
-	"/profile/:id",
-	authenticate,
-	isAdmin,
-	staffController.getUserProfile
-);
-router.put("/profile", authenticate, isAdmin, staffController.updateProfile);
-router.delete("/:id", authenticate, isAdmin, staffController.deleteStaff);
+router.get("/profile", authenticate, isAdmin, getMyProfile);
+router.get("/profile/:id", authenticate, isAdmin, getUserProfile);
+router.put("/profile", authenticate, isAdmin, updateProfile);
+router.delete("/:id", authenticate, isAdmin, deleteStaff);
 
-router.get("/", authenticate, isAdmin, staffController.getAllStaffs);
-module.exports = router;
+router.get("/", authenticate, isAdmin, getAllStaffs);
+export default router;

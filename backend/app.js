@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const ApiError = require("./app/api-error");
 const readerRoutes = require("./app/routes/reader.routes");
-
+const staffRoutes = require("./app/routes/staff.routes");
 const app = express();
 
 app.use(cors());
@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/readers", readerRoutes);
-
+app.use("/staffs", staffRoutes);
 app.use((req, res, next) => {
 	return next(new ApiError(404, "Resource not found"));
 });

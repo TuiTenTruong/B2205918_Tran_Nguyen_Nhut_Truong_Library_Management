@@ -135,7 +135,7 @@ class ReaderService {
 		const skip = (page - 1) * limit;
 
 		const readers = await DocGia.find(query)
-			.select("-password")
+			.select("-MatKhau")
 			.limit(parseInt(limit))
 			.skip(skip)
 			.sort({ createdAt: -1 });

@@ -1,26 +1,17 @@
-import { Router } from "express";
+const { Router } = require("express");
 const router = Router();
+const ReaderController = require("../controllers/reader.controller");
+const { authenticate } = require("../middleware/auth.middleware");
+const { isAdmin } = require("../middleware/admin.middleware");
 
-import {
-	registerReader,
-	loginReader,
-	getMyProfile,
-	getUserProfile,
-	updateProfile,
-	getAllReaders,
-	deleteReader,
-} from "../controllers/reader.controller";
-import { authenticate } from "../middleware/auth.middleware";
-import { isAdmin } from "../middleware/admin.middleware";
+router.post("/register", ReaderController.registerReader);
+router.post("/login", ReaderController.loginReader);
 
-router.post("/register", registerReader);
-router.post("/login", loginReader);
+router.get("/profile", authenticate, ReaderController.getMyProfile);
+router.get("/profile/:id", authenticate, ReaderController.getUserProfile);
+router.put("/profile", authenticate, ReaderController.updateProfile);
 
-router.get("/profile", authenticate, getMyProfile);
-router.get("/profile/:id", authenticate, getUserProfile);
-router.put("/profile", authenticate, updateProfile);
+router.get("/", authenticate, isAdmin, ReaderController.getAllReaders);
+router.delete("/:id", authenticate, isAdmin, ReaderController.deleteReader);
 
-router.get("/", authenticate, isAdmin, getAllReaders);
-router.delete("/:id", authenticate, isAdmin, deleteReader);
-
-export default router;
+module.exports = router;

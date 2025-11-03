@@ -1,5 +1,6 @@
-import readerService from "../services/reader.service";
-export async function registerReader(req, res) {
+const readerService = require("../services/reader.service");
+
+exports.registerReader = async (req, res) => {
 	try {
 		const result = await readerService.register(req.body);
 		return res.status(201).json({
@@ -20,8 +21,9 @@ export async function registerReader(req, res) {
 			error: error.message,
 		});
 	}
-}
-export async function loginReader(req, res) {
+};
+
+exports.loginReader = async (req, res) => {
 	try {
 		const result = await readerService.login(req.body);
 		return res.status(200).json({
@@ -42,9 +44,9 @@ export async function loginReader(req, res) {
 			error: error.message,
 		});
 	}
-}
+};
 
-export async function getMyProfile(req, res) {
+exports.getMyProfile = async (req, res) => {
 	try {
 		const userId = req.userId;
 		console.log(userId);
@@ -62,8 +64,9 @@ export async function getMyProfile(req, res) {
 			error: error.message,
 		});
 	}
-}
-export async function getUserProfile(req, res) {
+};
+
+exports.getUserProfile = async (req, res) => {
 	try {
 		const userId = req.params.id;
 		const reader = await readerService.getReaderById(userId);
@@ -80,8 +83,9 @@ export async function getUserProfile(req, res) {
 			error: error.message,
 		});
 	}
-}
-export async function updateProfile(req, res) {
+};
+
+exports.updateProfile = async (req, res) => {
 	try {
 		const reader = await readerService.updateReader(req.userId, req.body);
 
@@ -96,8 +100,9 @@ export async function updateProfile(req, res) {
 			message: error.message,
 		});
 	}
-}
-export async function deleteReader(req, res) {
+};
+
+exports.deleteReader = async (req, res) => {
 	try {
 		const result = await readerService.deleteReader(req.params.id);
 
@@ -111,8 +116,9 @@ export async function deleteReader(req, res) {
 			message: error.message,
 		});
 	}
-}
-export async function getAllReaders(req, res) {
+};
+
+exports.getAllReaders = async (req, res) => {
 	try {
 		const filters = {
 			page: req.query.page,
@@ -133,4 +139,4 @@ export async function getAllReaders(req, res) {
 			message: error.message,
 		});
 	}
-}
+};

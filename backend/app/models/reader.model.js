@@ -1,5 +1,5 @@
-import { Schema, model } from "mongoose";
-import { nanoid } from "nanoid";
+const { Schema, model } = require("mongoose");
+const { nanoid } = require("nanoid");
 
 const docGiaSchema = new Schema(
 	{
@@ -79,4 +79,4 @@ const docGiaSchema = new Schema(
 	}
 );
 
-export default model("DocGia", docGiaSchema);
+module.exports = model("DocGia", docGiaSchema);

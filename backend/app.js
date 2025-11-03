@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const ApiError = require("./app/api-error");
-const readerRoutes = require("./app/routes/reader.routes").default;
-const staffRoutes = require("./app/routes/staff.routes").default;
-const bookRoutes = require("./app/routes/book.routes").default;
+const readerRoutes = require("./app/routes/reader.routes");
+const staffRoutes = require("./app/routes/staff.routes");
+const bookRoutes = require("./app/routes/book.routes");
 const app = express();
 
 app.use(cors());

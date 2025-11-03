@@ -1,13 +1,7 @@
-import {
-	findOne,
-	create,
-	findOneAndUpdate,
-	find,
-	countDocuments,
-} from "../models/reader.model";
-import { hash, compare } from "bcrypt";
-import { sign } from "jsonwebtoken";
-import ApiError from "../api-error";
+const DocGia = require("../models/reader.model");
+const { hash, compare } = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const ApiError = require("../api-error");
 
 class ReaderService {
 	async register(userData) {
@@ -23,11 +17,11 @@ class ReaderService {
 		} = userData;
 
 		// Check if email or phone already exists
-		const existingEmail = await findOne({ Email });
+		const existingEmail = await DocGia.findOne({ Email });
 		if (existingEmail) {
 			throw new ApiError(409, "Email đã được đăng ký");
 		}
-		const existingPhone = await findOne({ DienThoai });
+		const existingPhone = await DocGia.findOne({ DienThoai });
 		if (existingPhone) {
 			throw new ApiError(409, "Số điện thoại đã được đăng ký");
 		}
@@ -36,7 +30,7 @@ class ReaderService {
 		const hashedPassword = await hash(MatKhau, 10);
 
 		// Create new reader
-		const newReader = await create({
+		const newReader = await DocGia.create({
 			HoLot,
 			Ten,
 			Email,
@@ -62,7 +56,7 @@ class ReaderService {
 		const { Email, MatKhau } = loginData;
 
 		// Find reader by email
-		const reader = await findOne({ Email });
+		const reader = await DocGia.findOne({ Email });
 		if (!reader) {
 			throw new ApiError(401, "Đăng nhập thất bại");
 		}
@@ -73,7 +67,7 @@ class ReaderService {
 		}
 
 		// Generate JWT token
-		const Token = sign(
+		const Token = jwt.sign(
 			{ id: reader.MaDocGia, email: reader.Email },
 			process.env.JWT_SECRET,
 			{ expiresIn: process.env.JWT_EXPIRE }
@@ -88,7 +82,7 @@ class ReaderService {
 		};
 	}
 	async getReaderById(MaDocGia) {
-		const reader = await findOne({ MaDocGia })
+		const reader = await DocGia.findOne({ MaDocGia })
 			.select("-MatKhau")
 			.where({ DaXoa: false });
 		if (!reader) {
@@ -100,7 +94,7 @@ class ReaderService {
 	async updateReader(MaDocGia, updateData) {
 		const { HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai } = updateData;
 
-		const reader = await findOneAndUpdate(
+		const reader = await DocGia.findOneAndUpdate(
 			{ MaDocGia },
 			{ HoLot, Ten, NgaySinh, Phai, DiaChi, DienThoai },
 			{ new: true, runValidators: true }
@@ -113,7 +107,7 @@ class ReaderService {
 		return reader;
 	}
 	async deleteReader(MaDocGia) {
-		const reader = await findOneAndUpdate(
+		const reader = await DocGia.findOneAndUpdate(
 			{ MaDocGia },
 			{ DaXoa: true },
 			{ new: true }
@@ -140,13 +134,13 @@ class ReaderService {
 
 		const skip = (page - 1) * limit;
 
-		const readers = await find(query)
+		const readers = await DocGia.find(query)
 			.select("-MatKhau")
 			.limit(parseInt(limit))
 			.skip(skip)
 			.sort({ createdAt: -1 });
 
-		const total = await countDocuments(query);
+		const total = await DocGia.countDocuments(query);
 
 		return {
 			readers,
@@ -160,4 +154,4 @@ class ReaderService {
 	}
 }
 
-export default new ReaderService();
+module.exports = new ReaderService();

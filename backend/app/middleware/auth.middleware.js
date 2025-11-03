@@ -1,6 +1,6 @@
-import { verify } from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-export function authenticate(req, res, next) {
+const authenticate = (req, res, next) => {
 	try {
 		// Lấy token từ header
 		const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -13,7 +13,7 @@ export function authenticate(req, res, next) {
 		}
 
 		// Verify token
-		const decoded = verify(token, process.env.JWT_SECRET);
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 		req.userId = decoded.id;
 		req.userEmail = decoded.email;
 		next();
@@ -23,4 +23,7 @@ export function authenticate(req, res, next) {
 			message: "Token không hợp lệ hoặc đã hết hạn",
 		});
 	}
-}
+};
+
+// Xuất theo named export để có thể dùng destructuring: const { authenticate } = require(".../auth.middleware")
+module.exports = { authenticate };

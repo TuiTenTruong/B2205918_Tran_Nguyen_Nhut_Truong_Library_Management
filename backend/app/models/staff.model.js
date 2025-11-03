@@ -1,5 +1,5 @@
-import { Schema, model } from "mongoose";
-import { nanoid } from "nanoid";
+const { Schema, model } = require("mongoose");
+const { nanoid } = require("nanoid");
 const nhanVienSchema = new Schema(
 	{
 		MSNV: {
@@ -49,4 +49,4 @@ const nhanVienSchema = new Schema(
 		timestamps: true,
 	}
 );
-export default model("NhanVien", nhanVienSchema);
+module.exports = model("NhanVien", nhanVienSchema);

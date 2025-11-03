@@ -1,13 +1,7 @@
-import {
-	findOne,
-	create,
-	findOneAndUpdate,
-	find,
-	countDocuments,
-} from "../models/staff.model";
-import { hash, compare } from "bcrypt";
-import { sign } from "jsonwebtoken";
-import ApiError from "../api-error";
+const NhanVien = require("../models/staff.model");
+const { hash, compare } = require("bcrypt");
+const { sign } = require("jsonwebtoken");
+const ApiError = require("../api-error");
 
 class StaffService {
 	async createStaffAccount(staff) {
@@ -15,11 +9,11 @@ class StaffService {
 			staff;
 
 		// Check if email or phone already exists
-		const existingEmail = await findOne({ Email });
+		const existingEmail = await NhanVien.findOne({ Email });
 		if (existingEmail) {
 			throw new ApiError(409, "Email đã được đăng ký");
 		}
-		const existingPhone = await findOne({ SoDienThoai });
+		const existingPhone = await NhanVien.findOne({ SoDienThoai });
 		if (existingPhone) {
 			throw new ApiError(409, "Số điện thoại đã được đăng ký");
 		}
@@ -28,7 +22,7 @@ class StaffService {
 		const hashedPassword = await hash(Password, 10);
 
 		// Create new staff
-		const newStaff = await create({
+		const newStaff = await NhanVien.create({
 			MSNV,
 			Email,
 			HoTenNV,
@@ -37,8 +31,7 @@ class StaffService {
 			DiaChi,
 			SoDienThoai,
 		});
-
-		await newStaff.save();
+		// create() already saves the document
 
 		// Return the created staff data without the password
 		return {
@@ -55,7 +48,7 @@ class StaffService {
 		const { Email, Password } = loginData;
 
 		// Find staff by email
-		const staff = await findOne({ Email });
+		const staff = await NhanVien.findOne({ Email });
 		if (!staff) {
 			throw new ApiError(401, "Đăng nhập thất bại");
 		}
@@ -80,7 +73,7 @@ class StaffService {
 		};
 	}
 	async getStaffById(MSNV) {
-		const staff = await findOne({ MSNV })
+		const staff = await NhanVien.findOne({ MSNV })
 			.select("-Password")
 			.where({ DaXoa: false });
 		if (!staff) {
@@ -92,7 +85,7 @@ class StaffService {
 	async updateStaff(MSNV, updateData) {
 		const { HoTenNV, ChucVu, DiaChi, SoDienThoai } = updateData;
 
-		const staff = await findOneAndUpdate(
+		const staff = await NhanVien.findOneAndUpdate(
 			{ MSNV },
 			{ HoTenNV, ChucVu, DiaChi, SoDienThoai },
 			{ new: true, runValidators: true }
@@ -105,7 +98,7 @@ class StaffService {
 		return staff;
 	}
 	async deleteStaff(MSNV) {
-		const staff = await findOneAndUpdate(
+		const staff = await NhanVien.findOneAndUpdate(
 			{ MSNV },
 			{ DaXoa: true },
 			{ new: true }
@@ -132,13 +125,13 @@ class StaffService {
 
 		const skip = (page - 1) * limit;
 
-		const staffs = await find(query)
+		const staffs = await NhanVien.find(query)
 			.select("-Password")
 			.limit(parseInt(limit))
 			.skip(skip)
 			.sort({ createdAt: -1 });
 
-		const total = await countDocuments(query);
+		const total = await NhanVien.countDocuments(query);
 
 		return {
 			staffs,
@@ -152,4 +145,4 @@ class StaffService {
 	}
 }
 
-export default new StaffService();
+module.exports = new StaffService();

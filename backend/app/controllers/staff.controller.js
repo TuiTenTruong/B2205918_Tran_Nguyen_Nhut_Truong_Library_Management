@@ -1,6 +1,6 @@
-import { get } from "mongoose";
-import StaffService from "../services/staff.service";
-export async function createStaffAccount(req, res) {
+const StaffService = require("../services/staff.service");
+
+exports.createStaffAccount = async (req, res) => {
 	try {
 		const result = await StaffService.createStaffAccount(req.body);
 		return res.status(201).json({
@@ -21,8 +21,9 @@ export async function createStaffAccount(req, res) {
 			error: error.message,
 		});
 	}
-}
-export async function loginAsStaff(req, res) {
+};
+
+exports.loginAsStaff = async (req, res) => {
 	try {
 		const result = await StaffService.loginAsStaff(req.body);
 		return res.status(200).json({
@@ -43,9 +44,9 @@ export async function loginAsStaff(req, res) {
 			error: error.message,
 		});
 	}
-}
+};
 
-export async function getMyProfile(req, res) {
+exports.getMyProfile = async (req, res) => {
 	try {
 		const userId = req.userId;
 		console.log(userId);
@@ -63,8 +64,9 @@ export async function getMyProfile(req, res) {
 			error: error.message,
 		});
 	}
-}
-export async function getUserProfile(req, res) {
+};
+
+exports.getUserProfile = async (req, res) => {
 	try {
 		const userId = req.params.id;
 		console.log(userId);
@@ -82,8 +84,9 @@ export async function getUserProfile(req, res) {
 			error: error.message,
 		});
 	}
-}
-export async function updateProfile(req, res) {
+};
+
+exports.updateProfile = async (req, res) => {
 	try {
 		const staff = await StaffService.updateStaff(req.userId, req.body);
 
@@ -98,8 +101,9 @@ export async function updateProfile(req, res) {
 			message: error.message,
 		});
 	}
-}
-export async function deleteStaff(req, res) {
+};
+
+exports.deleteStaff = async (req, res) => {
 	try {
 		const result = await StaffService.deleteStaff(req.params.id);
 
@@ -113,9 +117,9 @@ export async function deleteStaff(req, res) {
 			message: error.message,
 		});
 	}
-}
+};
 
-export async function getAllStaffs(req, res) {
+exports.getAllStaffs = async (req, res) => {
 	try {
 		const filters = {
 			page: req.query.page,
@@ -136,4 +140,4 @@ export async function getAllStaffs(req, res) {
 			message: error.message,
 		});
 	}
-}
+};

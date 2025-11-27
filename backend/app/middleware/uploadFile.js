@@ -1,16 +1,17 @@
-import multer, { diskStorage } from "multer";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-import generateFileName from "../utils/fileName.js";
+const multer = require("multer");
+const path = require("path");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const generateFileName = (originalName) => {
+	const timestamp = Date.now();
+	const ext = path.extname(originalName);
+	return `${timestamp}${ext}`;
+};
 
 const createUploader = (subFolder) => {
-	const storage = diskStorage({
+	const storage = multer.diskStorage({
 		destination: function (req, file, cb) {
-			// Đường dẫn đến thư mục public/uploads từ thư mục gốc của project
-			cb(null, join(__dirname, `../../../public/uploads/${subFolder}`));
+			// Đường dẫn đến thư mục public/uploads từ thư mục middleware
+			cb(null, path.join(__dirname, `../../public/uploads/${subFolder}`));
 		},
 		filename: function (req, file, cb) {
 			cb(null, generateFileName(file.originalname));
@@ -20,4 +21,4 @@ const createUploader = (subFolder) => {
 	return multer({ storage: storage });
 };
 
-export default createUploader;
+module.exports = createUploader;

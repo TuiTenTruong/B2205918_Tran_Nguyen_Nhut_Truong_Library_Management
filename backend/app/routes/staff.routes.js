@@ -4,10 +4,11 @@ const StaffController = require("../controllers/staff.controller");
 const { authenticate } = require("../middleware/auth.middleware");
 
 const { isAdmin } = require("../middleware/admin.middleware");
-
+//Route công khai
 router.post("/create", StaffController.createStaffAccount);
 router.post("/login", StaffController.loginAsStaff);
 
+//Route chỉ dành cho admin
 router.get("/profile", authenticate, isAdmin, StaffController.getMyProfile);
 router.get(
 	"/profile/:id",

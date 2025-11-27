@@ -53,7 +53,7 @@ const docGiaSchema = new Schema(
 		Muon: [
 			{
 				MASACH: {
-					type: Schema.Types.ObjectId,
+					type: String,
 					ref: "Sach",
 				},
 				NGAYMUON: {
@@ -63,8 +63,8 @@ const docGiaSchema = new Schema(
 				NGAYTRA: Date,
 				TRANGTHAI: {
 					type: String,
-					enum: ["pending", "approved", "returned"],
-					default: "pending",
+					enum: ["Đang mượn", "Đã trả", "Quá hạn"],
+					default: "Đang mượn",
 				},
 			},
 		],

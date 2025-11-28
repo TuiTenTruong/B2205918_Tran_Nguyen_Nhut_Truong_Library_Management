@@ -10,7 +10,12 @@ router.post("/login", ReaderController.loginReader);
 router.get("/profile", authenticate, ReaderController.getMyProfile);
 router.get("/profile/:id", authenticate, ReaderController.getUserProfile);
 router.put("/profile", authenticate, ReaderController.updateProfile);
-
+router.post(
+	"/favorite/:bookId",
+	authenticate,
+	ReaderController.toggleFavoriteBook
+);
+router.post("/save/:bookId", authenticate, ReaderController.toggleSavedBook);
 //Route chỉ dành cho admin
 router.get("/", authenticate, isAdmin, ReaderController.getAllReaders);
 router.delete("/:id", authenticate, isAdmin, ReaderController.deleteReader);

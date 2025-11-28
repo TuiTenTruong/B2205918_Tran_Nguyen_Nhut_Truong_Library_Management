@@ -45,6 +45,10 @@ const bookSchema = new Schema(
 			required: [true, "Tác giả là bắt buộc"],
 			trim: true,
 		},
+		YeuThich: {
+			type: Number,
+			default: 0,
+		},
 		DaXoa: {
 			type: Boolean,
 			default: false,

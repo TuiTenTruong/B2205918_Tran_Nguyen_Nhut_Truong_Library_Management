@@ -9,7 +9,6 @@ exports.registerReader = async (req, res) => {
 			data: result,
 		});
 	} catch (error) {
-		// Check if the error is a known "conflict" error from the service
 		if (error.statusCode === 409) {
 			return res
 				.status(409)
@@ -32,7 +31,6 @@ exports.loginReader = async (req, res) => {
 			data: result,
 		});
 	} catch (error) {
-		// Check if the error is a known "conflict" error from the service
 		if (error.statusCode === 409) {
 			return res
 				.status(409)
@@ -137,6 +135,45 @@ exports.getAllReaders = async (req, res) => {
 		res.status(500).json({
 			success: false,
 			message: error.message,
+		});
+	}
+};
+exports.toggleFavoriteBook = async (req, res) => {
+	try {
+		const MaDocGia = req.userId;
+		const { bookId } = req.params;
+
+		const result = await readerService.toggleFavoriteBook(MaDocGia, bookId);
+
+		return res.status(200).json({
+			success: true,
+			message: result.isLiked ? "Đã thích sách" : "Đã bỏ thích sách",
+			data: result,
+		});
+	} catch (error) {
+		return res.status(error.statusCode || 500).json({
+			success: false,
+			message: error.message || "Lỗi khi cập nhật yêu thích",
+		});
+	}
+};
+
+exports.toggleSavedBook = async (req, res) => {
+	try {
+		const MaDocGia = req.userId;
+		const { bookId } = req.params;
+
+		const result = await readerService.toggleSavedBook(MaDocGia, bookId);
+
+		return res.status(200).json({
+			success: true,
+			message: result.isSaved ? "Đã lưu sách" : "Đã bỏ lưu sách",
+			data: result,
+		});
+	} catch (error) {
+		return res.status(error.statusCode || 500).json({
+			success: false,
+			message: error.message || "Lỗi khi cập nhật lưu sách",
 		});
 	}
 };

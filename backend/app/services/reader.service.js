@@ -1,4 +1,5 @@
 const DocGia = require("../models/reader.model");
+const Sach = require("../models/book.model");
 const { hash, compare } = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const ApiError = require("../api-error");
@@ -151,6 +152,74 @@ class ReaderService {
 				totalPages: Math.ceil(total / limit),
 			},
 		};
+	}
+
+	async toggleFavoriteBook(MaDocGia, MaSach) {
+		const reader = await DocGia.findOne({ MaDocGia });
+		if (!reader) {
+			throw new ApiError(404, "Độc giả không tồn tại");
+		}
+
+		const book = await Sach.findOne({ MaSach, DaXoa: false });
+		if (!book) {
+			throw new ApiError(404, "Sách không tồn tại");
+		}
+
+		if (!reader.YeuThichSach) {
+			reader.YeuThichSach = [];
+		}
+
+		const index = reader.YeuThichSach.indexOf(MaSach);
+		let isLiked;
+
+		if (index === -1) {
+			reader.YeuThichSach.push(MaSach);
+			isLiked = true;
+			book.YeuThich = (book.YeuThich || 0) + 1;
+		} else {
+			reader.YeuThichSach.splice(index, 1);
+			isLiked = false;
+			book.YeuThich = Math.max((book.YeuThich || 0) - 1, 0);
+		}
+
+		await reader.save();
+		await book.save();
+
+		return {
+			isLiked,
+			likes: book.YeuThich,
+		};
+	}
+
+	async toggleSavedBook(MaDocGia, MaSach) {
+		const reader = await DocGia.findOne({ MaDocGia });
+		if (!reader) {
+			throw new ApiError(404, "Độc giả không tồn tại");
+		}
+
+		const book = await Sach.findOne({ MaSach, DaXoa: false });
+		if (!book) {
+			throw new ApiError(404, "Sách không tồn tại");
+		}
+
+		if (!reader.SachDaLuu) {
+			reader.SachDaLuu = [];
+		}
+
+		const index = reader.SachDaLuu.indexOf(MaSach);
+		let isSaved;
+
+		if (index === -1) {
+			reader.SachDaLuu.push(MaSach);
+			isSaved = true;
+		} else {
+			reader.SachDaLuu.splice(index, 1);
+			isSaved = false;
+		}
+
+		await reader.save();
+
+		return { isSaved };
 	}
 }
 

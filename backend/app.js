@@ -18,11 +18,11 @@ app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
 
-app.use("/readers", readerRoutes);
-app.use("/staffs", staffRoutes);
-app.use("/books", bookRoutes);
-app.use("/publishers", publisherRoutes);
-app.use("/borrows", borrowRoutes);
+app.use("/api/readers", readerRoutes);
+app.use("/api/staffs", staffRoutes);
+app.use("/api/books", bookRoutes);
+app.use("/api/publishers", publisherRoutes);
+app.use("/api/borrows", borrowRoutes);
 app.use((req, res, next) => {
 	return next(new ApiError(404, "Resource not found"));
 });

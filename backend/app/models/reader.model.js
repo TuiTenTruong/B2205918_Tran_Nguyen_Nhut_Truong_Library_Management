@@ -50,6 +50,18 @@ const docGiaSchema = new Schema(
 			required: [true, "Mật khẩu là bắt buộc"],
 			trim: true,
 		},
+		YeuThichSach: [
+			{
+				type: String,
+				ref: "Sach",
+			},
+		],
+		SachDaLuu: [
+			{
+				type: String,
+				ref: "Sach",
+			},
+		],
 		Muon: [
 			{
 				MASACH: {

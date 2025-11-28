@@ -19,10 +19,11 @@ class ReaderService {
 		return res.data;
 	}
 
-	async toggleSave(bookId) {
-		const res = await this.api.post(`/save/${bookId}`);
-		return res.data;
+	async getFavorites() {
+		const res = await this.api.get("/favorite");
+		return res.data.data || [];
 	}
+
 	async getMyProfile() {
 		return (await this.api.get("/profile")).data;
 	}

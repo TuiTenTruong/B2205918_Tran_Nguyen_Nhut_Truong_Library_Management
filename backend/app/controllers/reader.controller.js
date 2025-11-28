@@ -158,22 +158,22 @@ exports.toggleFavoriteBook = async (req, res) => {
 	}
 };
 
-exports.toggleSavedBook = async (req, res) => {
+exports.getFavoriteBooks = async (req, res) => {
 	try {
 		const MaDocGia = req.userId;
-		const { bookId } = req.params;
 
-		const result = await readerService.toggleSavedBook(MaDocGia, bookId);
+		const books = await readerService.getFavoriteBooks(MaDocGia);
 
 		return res.status(200).json({
 			success: true,
-			message: result.isSaved ? "Đã lưu sách" : "Đã bỏ lưu sách",
-			data: result,
+			message: "Lấy danh sách sách yêu thích thành công",
+			data: books,
 		});
 	} catch (error) {
-		return res.status(error.statusCode || 500).json({
+		return res.status(500).json({
 			success: false,
-			message: error.message || "Lỗi khi cập nhật lưu sách",
+			message: "Lỗi lấy danh sách sách yêu thích",
+			error: error.message,
 		});
 	}
 };

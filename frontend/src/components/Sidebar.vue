@@ -14,7 +14,7 @@
 					<RouterLink
 						to="/"
 						class="nav-link sidebar-link"
-						active-class="sidebar-link--active"
+						exact-active-class="sidebar-link--active"
 					>
 						<i class="fa-solid fa-magnifying-glass me-2"></i>
 						Search Books
@@ -22,17 +22,14 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link sidebar-link disabled">
+					<RouterLink
+						to="/favorites"
+						class="nav-link sidebar-link"
+						active-class="sidebar-link--active"
+					>
 						<i class="fa-regular fa-heart me-2"></i>
 						Favorite Books
-					</a>
-				</li>
-
-				<li class="nav-item">
-					<a class="nav-link sidebar-link disabled">
-						<i class="fa-regular fa-bookmark me-2"></i>
-						Saved Books
-					</a>
+					</RouterLink>
 				</li>
 
 				<li class="nav-item">
@@ -66,6 +63,7 @@
 
 			<button
 				class="btn btn-outline-secondary w-100 rounded-pill mt-3 btn-sm"
+				@click="handleLogout"
 			>
 				<i class="fa-solid fa-arrow-right-from-bracket me-1"></i>
 				Logout
@@ -107,12 +105,18 @@
 </template>
 
 <script>
+import { logoutUser } from "@/utils/auth";
 export default {
 	name: "Sidebar",
 	props: {
 		isOpen: {
 			type: Boolean,
 			default: false,
+		},
+	},
+	methods: {
+		handleLogout() {
+			logoutUser(this.$router);
 		},
 	},
 };

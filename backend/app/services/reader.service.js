@@ -191,35 +191,18 @@ class ReaderService {
 		};
 	}
 
-	async toggleSavedBook(MaDocGia, MaSach) {
+	async getFavoriteBooks(MaDocGia) {
 		const reader = await DocGia.findOne({ MaDocGia });
 		if (!reader) {
 			throw new ApiError(404, "Độc giả không tồn tại");
 		}
 
-		const book = await Sach.findOne({ MaSach, DaXoa: false });
-		if (!book) {
-			throw new ApiError(404, "Sách không tồn tại");
-		}
+		const favoriteBooks = await Sach.find({
+			MaSach: { $in: reader.YeuThichSach || [] },
+			DaXoa: false,
+		});
 
-		if (!reader.SachDaLuu) {
-			reader.SachDaLuu = [];
-		}
-
-		const index = reader.SachDaLuu.indexOf(MaSach);
-		let isSaved;
-
-		if (index === -1) {
-			reader.SachDaLuu.push(MaSach);
-			isSaved = true;
-		} else {
-			reader.SachDaLuu.splice(index, 1);
-			isSaved = false;
-		}
-
-		await reader.save();
-
-		return { isSaved };
+		return favoriteBooks;
 	}
 }
 

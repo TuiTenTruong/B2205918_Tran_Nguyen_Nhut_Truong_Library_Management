@@ -10,7 +10,7 @@
 			<div
 				class="position-absolute top-0 end-0 d-flex gap-1 p-2 align-items-center"
 			>
-				<span class="small text-danger ms-1">
+				<span class="small text-danger ms-1 fw-bold">
 					{{ book.YeuThich || 0 }}
 				</span>
 				<button
@@ -21,15 +21,6 @@
 					@click.stop="$emit('toggle-favorite', book)"
 				>
 					<i class="fa-solid fa-heart"></i>
-				</button>
-				<button
-					class="book-card__icon-btn"
-					:class="{
-						'book-card__icon-save--active': book._isSavedByMe,
-					}"
-					@click.stop="$emit('toggle-save', book)"
-				>
-					<i class="fa-solid fa-bookmark"></i>
 				</button>
 			</div>
 

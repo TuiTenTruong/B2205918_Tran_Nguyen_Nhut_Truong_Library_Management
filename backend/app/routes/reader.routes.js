@@ -15,7 +15,7 @@ router.post(
 	authenticate,
 	ReaderController.toggleFavoriteBook
 );
-router.post("/save/:bookId", authenticate, ReaderController.toggleSavedBook);
+router.get("/favorite", authenticate, ReaderController.getFavoriteBooks);
 //Route chỉ dành cho admin
 router.get("/", authenticate, isAdmin, ReaderController.getAllReaders);
 router.delete("/:id", authenticate, isAdmin, ReaderController.deleteReader);

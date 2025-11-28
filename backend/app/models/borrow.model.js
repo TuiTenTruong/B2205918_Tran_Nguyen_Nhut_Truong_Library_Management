@@ -45,11 +45,6 @@ const borrowSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		NhanVienXuLy: {
-			type: String,
-			required: [true, "Nhân viên xử lý là bắt buộc"],
-			trim: true,
-		},
 	},
 	{ timestamps: true, collection: "TheoDoiMuonSach" }
 );

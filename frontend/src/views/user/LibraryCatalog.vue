@@ -76,7 +76,7 @@
 import BookCard from "@/components/BookCard.vue";
 import BookService from "@/services/book.service";
 import ReaderService from "@/services/reader.service";
-
+import { toast } from "vue3-toastify";
 export default {
 	name: "LibraryCatalog",
 	components: { BookCard },
@@ -85,8 +85,12 @@ export default {
 			searchTerm: "",
 			selectedStatus: "",
 			books: [],
-			allCategories: [],
+			myFavoriteIds: [],
 		};
+	},
+	async created() {
+		await this.fetchMyFavoriteIds();
+		await this.fetchBooks();
 	},
 	computed: {
 		filteredBooks() {
@@ -107,54 +111,100 @@ export default {
 		},
 	},
 	methods: {
-		async fetchBooks(query = "") {
+		requireLogin() {
+			const token = localStorage.getItem("readerToken");
+			if (!token) {
+				toast.info("Vui lòng đăng nhập để sử dụng chức năng này.");
+				this.$router.push({
+					path: "/auth",
+					query: { mode: "login" },
+				});
+				return false;
+			}
+			return true;
+		},
+		async fetchMyFavoriteIds() {
 			try {
-				if (query) {
-					this.books = await BookService.searchBooks(query);
+				const res = await ReaderService.getMyProfile();
+				if (
+					res.success &&
+					res.data &&
+					Array.isArray(res.data.YeuThichSach)
+				) {
+					this.myFavoriteIds = res.data.YeuThichSach;
 				} else {
-					this.books = await BookService.getAllBooks();
+					this.myFavoriteIds = [];
 				}
 			} catch (error) {
+				console.error("Lỗi lấy profile:", error);
+				this.myFavoriteIds = [];
+			}
+		},
+
+		// gọi API lấy sách
+		async fetchBooks(query = "") {
+			try {
+				const list = query
+					? await BookService.searchBooks(query)
+					: await BookService.getAllBooks();
+
+				const favoriteSet = new Set(this.myFavoriteIds);
+
+				this.books = list.map((book) => ({
+					...book,
+					_isLikedByMe: favoriteSet.has(book.MaSach),
+				}));
+				console.log("Fetched books:", this.books);
+			} catch (error) {
 				console.error("Error fetching books:", error);
+				toast.error("Không tải được danh sách sách.");
 				this.books = [];
 			}
 		},
 
+		// YÊU THÍCH SÁCH
 		async toggleFavorite(book) {
+			if (!this.requireLogin()) return;
+
 			try {
 				const res = await ReaderService.toggleFavorite(book.MaSach);
-
-				// cập nhật giao diện
 				if (res.success) {
-					book._isLikedByMe = res.data.isLiked; // cờ local cho user hiện tại
-					book.YeuThich = res.data.likes; // counter tổng từ backend
+					book._isLikedByMe = res.data.isLiked;
+					book.YeuThich = res.data.likes;
+					toast.success(
+						res.data.isLiked
+							? "Đã thêm vào danh sách yêu thích."
+							: "Đã bỏ khỏi danh sách yêu thích."
+					);
+				} else {
+					toast.error(res.message || "Không thể cập nhật yêu thích.");
 				}
 			} catch (error) {
 				console.error("Lỗi toggle favorite:", error);
+				toast.error("Có lỗi xảy ra khi cập nhật yêu thích.");
 			}
 		},
 
-		async toggleSave(book) {
-			try {
-				const res = await ReaderService.toggleSave(book.MaSach);
-				if (res.success) {
-					book._isSavedByMe = res.data.isSaved;
-				}
-			} catch (error) {
-				console.error("Lỗi toggle save:", error);
-			}
-		},
+		// MƯỢN SÁCH
+		async borrowBook(book) {
+			if (!this.requireLogin()) return;
 
-		borrowBook(book) {
 			if (book.SoQuyen <= 0) {
-				alert("Book is not available right now.");
+				toast.warn("Sách hiện không còn để mượn.");
 				return;
 			}
-			alert(`Borrowing book: ${book.TenSach}`);
+
+			// TODO: gọi API mượn sách nếu backend đã có
+			// await BorrowService.borrow(book.MaSach);
+			toast.success(
+				`Đã thêm sách "${book.TenSach}" vào danh sách mượn (demo).`
+			);
 		},
 	},
-	created() {
-		this.fetchBooks();
+	watch: {
+		searchTerm(newVal) {
+			this.fetchBooks(newVal);
+		},
 	},
 };
 </script>

@@ -33,33 +33,34 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link sidebar-link disabled">
+					<RouterLink
+						to="/history"
+						class="nav-link sidebar-link"
+						active-class="sidebar-link--active"
+					>
 						<i class="fa-regular fa-clock me-2"></i>
 						History
-					</a>
+					</RouterLink>
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link sidebar-link disabled">
+					<RouterLink
+						to="/profile"
+						class="nav-link sidebar-link"
+						active-class="sidebar-link--active"
+					>
 						<i class="fa-regular fa-user me-2"></i>
 						Profile
-					</a>
-				</li>
-
-				<li class="nav-item">
-					<a class="nav-link sidebar-link disabled">
-						<i class="fa-regular fa-comments me-2"></i>
-						Chatbot
-					</a>
+					</RouterLink>
 				</li>
 			</ul>
 		</div>
 
 		<div class="p-3 border-top small text-muted">
 			<div class="fw-semibold mb-1">Contact Us</div>
-			<div>Kalasalingam University</div>
-			<div>IT Department</div>
-			<div>library@klu.ac.in</div>
+			<div>TNNT Library</div>
+			<div></div>
+			<div>library@tnnt.edu.vn</div>
 
 			<button
 				class="btn btn-outline-secondary w-100 rounded-pill mt-3 btn-sm"
@@ -128,6 +129,30 @@ export default {
 	z-index: 1050;
 }
 
+/* Sidebar desktop: đứng yên khi cuộn */
+@media (min-width: 768px) {
+	.sidebar {
+		position: sticky;
+		top: 0;
+		align-self: flex-start;
+		height: 100vh;
+		max-height: 100vh;
+		overflow-y: auto; /* nếu không thích có thanh cuộn riêng thì bỏ dòng này */
+	}
+}
+
+/* Sidebar mobile */
+.sidebar--mobile {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: -260px;
+	transition: left 0.25s ease;
+}
+.sidebar--mobile-open {
+	left: 0;
+}
+
 .sidebar-link {
 	color: #4b5563;
 	border-radius: 999px;
@@ -142,16 +167,5 @@ export default {
 	background-color: #eef2ff;
 	color: #2563eb;
 	font-weight: 600;
-}
-
-.sidebar--mobile {
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: -260px;
-	transition: left 0.25s ease;
-}
-.sidebar--mobile-open {
-	left: 0;
 }
 </style>

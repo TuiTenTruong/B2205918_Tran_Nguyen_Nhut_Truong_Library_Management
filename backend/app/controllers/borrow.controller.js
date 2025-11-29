@@ -1,6 +1,44 @@
 const borrowService = require("../services/borrow.service");
 
-// Tạo phiếu mượn sách mới
+exports.borrowSelf = async (req, res) => {
+	try {
+		const MaDocGia = req.userId;
+		const { MaSach, NgayTra } = req.body;
+
+		if (!MaSach) {
+			return res.status(400).json({
+				success: false,
+				message: "Thiếu mã sách",
+			});
+		}
+
+		const borrowData = {
+			MaDocGia,
+			MaSach,
+			NgayTra,
+		};
+
+		const result = await borrowService.createBorrow(borrowData);
+
+		return res.status(201).json({
+			success: true,
+			message: "Mượn sách thành công",
+			data: result,
+		});
+	} catch (error) {
+		if (error.statusCode) {
+			return res
+				.status(error.statusCode)
+				.json({ success: false, message: error.message });
+		}
+		return res.status(500).json({
+			success: false,
+			message: "Lỗi mượn sách",
+			error: error.message,
+		});
+	}
+};
+
 exports.createBorrow = async (req, res) => {
 	try {
 		const result = await borrowService.createBorrow(req.body);
@@ -30,7 +68,6 @@ exports.getAllBorrows = async (req, res) => {
 			MaDocGia: req.query.MaDocGia,
 			MaSach: req.query.MaSach,
 			TinhTrang: req.query.TinhTrang,
-			NhanVienXuLy: req.query.NhanVienXuLy,
 		};
 
 		const borrows = await borrowService.getAllBorrows(filters);
@@ -75,7 +112,9 @@ exports.getBorrowById = async (req, res) => {
 // Lấy phiếu mượn theo độc giả
 exports.getBorrowsByReader = async (req, res) => {
 	try {
-		const borrows = await borrowService.getBorrowsByReader(req.params.readerId);
+		const borrows = await borrowService.getBorrowsByReader(
+			req.params.readerId
+		);
 		return res.status(200).json({
 			success: true,
 			message: "Lấy danh sách phiếu mượn của độc giả thành công",
@@ -113,11 +152,16 @@ exports.getBorrowsByBook = async (req, res) => {
 // Trả sách
 exports.returnBook = async (req, res) => {
 	try {
-		const { NgayTraThucTe } = req.body;
-		const borrow = await borrowService.returnBook(req.params.id, NgayTraThucTe);
+		const { NgayTraThucTe, MatSach } = req.body;
+		const borrow = await borrowService.returnBook(req.params.id, {
+			NgayTraThucTe,
+			MatSach,
+		});
 		return res.status(200).json({
 			success: true,
-			message: "Trả sách thành công",
+			message: MatSach
+				? "Xử lý mất sách thành công"
+				: "Trả sách thành công",
 			data: borrow,
 		});
 	} catch (error) {
@@ -133,11 +177,60 @@ exports.returnBook = async (req, res) => {
 		});
 	}
 };
+exports.payFine = async (req, res) => {
+	try {
+		const { amount } = req.body;
+		const result = await borrowService.payFine(req.params.id, amount);
 
+		return res.status(200).json({
+			success: true,
+			message: "Thanh toán tiền phạt thành công",
+			data: result,
+		});
+	} catch (error) {
+		if (error.statusCode) {
+			return res
+				.status(error.statusCode)
+				.json({ success: false, message: error.message });
+		}
+		return res.status(500).json({
+			success: false,
+			message: "Lỗi thanh toán tiền phạt",
+			error: error.message,
+		});
+	}
+};
+exports.payAllFinesByReader = async (req, res) => {
+	try {
+		const result = await borrowService.payAllFinesByReader(
+			req.params.readerId
+		);
+
+		return res.status(200).json({
+			success: true,
+			message: "Thanh toán toàn bộ tiền phạt của độc giả thành công",
+			data: result,
+		});
+	} catch (error) {
+		if (error.statusCode) {
+			return res
+				.status(error.statusCode)
+				.json({ success: false, message: error.message });
+		}
+		return res.status(500).json({
+			success: false,
+			message: "Lỗi thanh toán tiền phạt của độc giả",
+			error: error.message,
+		});
+	}
+};
 // Cập nhật phiếu mượn
 exports.updateBorrow = async (req, res) => {
 	try {
-		const borrow = await borrowService.updateBorrow(req.params.id, req.body);
+		const borrow = await borrowService.updateBorrow(
+			req.params.id,
+			req.body
+		);
 		return res.status(200).json({
 			success: true,
 			message: "Cập nhật phiếu mượn thành công",

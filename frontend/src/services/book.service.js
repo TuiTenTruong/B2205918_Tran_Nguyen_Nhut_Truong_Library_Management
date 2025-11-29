@@ -19,7 +19,7 @@ class BookService {
 
 	async getBookById(id) {
 		const res = await this.api.get(`/${id}`);
-		return res.data.data;
+		return res.data;
 	}
 
 	async createBook(data) {

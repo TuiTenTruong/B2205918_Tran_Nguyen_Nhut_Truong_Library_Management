@@ -37,9 +37,18 @@ const borrowSchema = new Schema(
 		TinhTrang: {
 			type: String,
 			required: [true, "Tình trạng là bắt buộc"],
-			enum: ["Đang mượn", "Đã trả", "Quá hạn"],
+			enum: ["Đang mượn", "Đã trả", "Quá hạn", "Mất sách"],
 			default: "Đang mượn",
 			trim: true,
+		},
+		TienPhat: {
+			type: Number,
+			default: 0,
+			min: 0,
+		},
+		DaThanhToanTienPhat: {
+			type: Boolean,
+			default: false,
 		},
 		DaXoa: {
 			type: Boolean,

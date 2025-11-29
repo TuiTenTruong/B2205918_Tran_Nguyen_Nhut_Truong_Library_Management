@@ -56,12 +56,6 @@ const docGiaSchema = new Schema(
 				ref: "Sach",
 			},
 		],
-		SachDaLuu: [
-			{
-				type: String,
-				ref: "Sach",
-			},
-		],
 		Muon: [
 			{
 				MASACH: {
@@ -80,6 +74,15 @@ const docGiaSchema = new Schema(
 				},
 			},
 		],
+		TienPhatChuaDong: {
+			type: Number,
+			default: 0,
+			min: 0,
+		},
+		CamMuonDen: {
+			type: Date,
+			default: null,
+		},
 		DaXoa: {
 			type: Boolean,
 			default: false,

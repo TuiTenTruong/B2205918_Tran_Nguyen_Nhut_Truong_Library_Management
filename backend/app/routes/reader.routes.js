@@ -18,6 +18,7 @@ router.post(
 router.get("/favorite", authenticate, ReaderController.getFavoriteBooks);
 //Route chỉ dành cho admin
 router.get("/", authenticate, isAdmin, ReaderController.getAllReaders);
+router.put("/:id", authenticate, isAdmin, ReaderController.updateReaderByAdmin);
 router.delete("/:id", authenticate, isAdmin, ReaderController.deleteReader);
 
 module.exports = router;

@@ -7,6 +7,8 @@ const staffRoutes = require("./app/routes/staff.routes");
 const bookRoutes = require("./app/routes/book.routes");
 const publisherRoutes = require("./app/routes/publisher.routes");
 const borrowRoutes = require("./app/routes/borrow.routes");
+const reservationRoutes = require("./app/routes/reservation.routes");
+const notificationRoutes = require("./app/routes/notification.routes");
 const app = express();
 
 app.use(cors());
@@ -23,6 +25,8 @@ app.use("/api/staffs", staffRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/publishers", publisherRoutes);
 app.use("/api/borrows", borrowRoutes);
+app.use("/api/reservations", reservationRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use((req, res, next) => {
 	return next(new ApiError(404, "Resource not found"));
 });

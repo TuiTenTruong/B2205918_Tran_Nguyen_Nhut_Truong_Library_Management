@@ -69,7 +69,7 @@ const docGiaSchema = new Schema(
 				NGAYTRA: Date,
 				TRANGTHAI: {
 					type: String,
-					enum: ["Đang mượn", "Đã trả", "Quá hạn"],
+					enum: ["Đang mượn", "Đã trả", "Quá hạn", "Mất sách"],
 					default: "Đang mượn",
 				},
 			},

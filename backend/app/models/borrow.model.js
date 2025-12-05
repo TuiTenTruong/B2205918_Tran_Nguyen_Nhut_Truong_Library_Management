@@ -50,6 +50,11 @@ const borrowSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		SoLanGiaHan: {
+			type: Number,
+			default: 0,
+			min: 0,
+		},
 		DaXoa: {
 			type: Boolean,
 			default: false,

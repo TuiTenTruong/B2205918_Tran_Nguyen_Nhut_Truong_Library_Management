@@ -19,6 +19,11 @@ const bookSchema = new Schema(
 			default: "default-book-cover.jpg",
 			trim: true,
 		},
+		MoTa: {
+			type: String,
+			required: [true, "Mô tả là bắt buộc"],
+			trim: true,
+		},
 		DonGia: {
 			type: Number,
 			required: [true, "Đơn giá là bắt buộc"],

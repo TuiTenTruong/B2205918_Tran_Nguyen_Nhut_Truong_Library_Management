@@ -43,7 +43,7 @@
 									v-model.trim="loginForm.Email"
 									type="email"
 									class="form-control"
-									placeholder="you@example.com"
+									placeholder="email@example.com"
 									required
 								/>
 							</div>
@@ -133,7 +133,7 @@
 									v-model.trim="registerForm.Email"
 									type="email"
 									class="form-control"
-									placeholder="you@example.com"
+									placeholder="email@example.com"
 									required
 								/>
 							</div>

@@ -11,12 +11,13 @@
 			<i class="fa-solid fa-bars fa-lg"></i>
 		</button>
 
-		<div class="fw-semibold d-none d-md-block">Library Management</div>
+		<div class="fw-semibold d-none d-md-block">Quản lý Thư viện</div>
 
 		<div class="ms-auto d-flex align-items-center gap-3">
 			<span class="small text-muted">
 				{{ formattedNow }}
 			</span>
+			<NotificationDropdown />
 			<div
 				class="rounded-circle d-flex align-items-center justify-content-center"
 				style="width: 36px; height: 36px; background-color: #fde047"
@@ -28,8 +29,13 @@
 </template>
 
 <script>
+import NotificationDropdown from "@/components/NotificationDropdown.vue";
+
 export default {
 	name: "HeaderBar",
+	components: {
+		NotificationDropdown,
+	},
 	data() {
 		return {
 			now: new Date(),
@@ -38,7 +44,7 @@ export default {
 	},
 	computed: {
 		formattedNow() {
-			return this.now.toLocaleString();
+			return this.now.toLocaleString("vi-VN");
 		},
 	},
 	mounted() {

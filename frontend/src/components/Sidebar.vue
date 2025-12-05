@@ -7,7 +7,7 @@
 		}"
 	>
 		<div class="p-3">
-			<div class="h5 fw-semibold mb-4">Library Management</div>
+			<div class="h5 fw-semibold mb-4">Quản lý Thư viện</div>
 
 			<ul class="nav flex-column gap-1">
 				<li class="nav-item">
@@ -17,7 +17,7 @@
 						exact-active-class="sidebar-link--active"
 					>
 						<i class="fa-solid fa-magnifying-glass me-2"></i>
-						Search Books
+						Tìm kiếm sách
 					</RouterLink>
 				</li>
 
@@ -28,7 +28,7 @@
 						active-class="sidebar-link--active"
 					>
 						<i class="fa-regular fa-heart me-2"></i>
-						Favorite Books
+						Sách yêu thích
 					</RouterLink>
 				</li>
 
@@ -39,7 +39,18 @@
 						active-class="sidebar-link--active"
 					>
 						<i class="fa-regular fa-clock me-2"></i>
-						History
+						Lịch sử mượn
+					</RouterLink>
+				</li>
+
+				<li class="nav-item">
+					<RouterLink
+						to="/reservations"
+						class="nav-link sidebar-link"
+						active-class="sidebar-link--active"
+					>
+						<i class="fa-regular fa-bookmark me-2"></i>
+						Sách đặt trước
 					</RouterLink>
 				</li>
 
@@ -50,15 +61,15 @@
 						active-class="sidebar-link--active"
 					>
 						<i class="fa-regular fa-user me-2"></i>
-						Profile
+						Hồ sơ
 					</RouterLink>
 				</li>
 			</ul>
 		</div>
 
 		<div class="p-3 border-top small text-muted">
-			<div class="fw-semibold mb-1">Contact Us</div>
-			<div>TNNT Library</div>
+			<div class="fw-semibold mb-1">Liên hệ</div>
+			<div>Thư viện TNNT</div>
 			<div></div>
 			<div>library@tnnt.edu.vn</div>
 
@@ -67,7 +78,7 @@
 				@click="handleLogout"
 			>
 				<i class="fa-solid fa-arrow-right-from-bracket me-1"></i>
-				Logout
+				Đăng xuất
 			</button>
 		</div>
 	</nav>
@@ -79,7 +90,7 @@
 	>
 		<div class="p-3">
 			<div class="d-flex align-items-center justify-content-between mb-3">
-				<span class="fw-semibold">Menu</span>
+				<span class="fw-semibold">Trình đơn</span>
 				<button
 					class="btn btn-sm btn-outline-secondary"
 					@click="$emit('close')"
@@ -97,7 +108,7 @@
 						@click="$emit('close')"
 					>
 						<i class="fa-solid fa-magnifying-glass me-2"></i>
-						Search Books
+						Tìm kiếm sách
 					</RouterLink>
 				</li>
 			</ul>

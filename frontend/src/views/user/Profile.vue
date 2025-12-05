@@ -2,9 +2,9 @@
 	<div class="container-fluid py-3 profile-page">
 		<div class="row mb-3">
 			<div class="col-12">
-				<h4 class="fw-bold mb-1">My Profile</h4>
+				<h4 class="fw-bold mb-1">Hồ sơ của tôi</h4>
 				<p class="text-muted mb-0">
-					View and manage your account information
+					Xem và quản lý thông tin tài khoản của bạn
 				</p>
 			</div>
 		</div>
@@ -22,12 +22,12 @@
 							</div>
 						</div>
 						<h6 class="fw-semibold mb-1">
-							{{ fullName || "Member" }}
+							{{ fullName || "Thành viên" }}
 						</h6>
 						<span
 							class="badge rounded-pill bg-dark text-white mb-1"
 						>
-							Member
+							Thành viên
 						</span>
 						<div class="text-muted small mb-3">
 							{{ form.Email }}
@@ -41,7 +41,7 @@
 									<i class="fa-regular fa-calendar"></i>
 								</div>
 								<div>
-									<div class="text-muted">Member Since</div>
+									<div class="text-muted">Thành viên từ</div>
 									<div class="fw-semibold">
 										{{ memberSinceText }}
 									</div>
@@ -53,7 +53,7 @@
 									<i class="fa-solid fa-phone"></i>
 								</div>
 								<div>
-									<div class="text-muted">Phone</div>
+									<div class="text-muted">Số điện thoại</div>
 									<div class="fw-semibold">
 										{{ form.DienThoai || "Chưa cập nhật" }}
 									</div>
@@ -65,9 +65,23 @@
 									<i class="fa-solid fa-location-dot"></i>
 								</div>
 								<div>
-									<div class="text-muted">Address</div>
+									<div class="text-muted">Địa chỉ</div>
 									<div class="fw-semibold">
 										{{ form.DiaChi || "Chưa cập nhật" }}
+									</div>
+								</div>
+							</div>
+
+							<div class="d-flex mt-2" v-if="isBanned">
+								<div class="me-2">
+									<i class="fa-solid fa-ban text-danger"></i>
+								</div>
+								<div>
+									<div class="text-danger">
+										Trạng thái cấm mượn
+									</div>
+									<div class="fw-semibold text-danger">
+										Đến {{ banDateText }}
 									</div>
 								</div>
 							</div>
@@ -79,7 +93,7 @@
 			<div class="col-12 col-lg-8">
 				<div class="card border-0 shadow-sm h-100">
 					<div class="card-body">
-						<h6 class="fw-semibold mb-3">Edit Information</h6>
+						<h6 class="fw-semibold mb-3">Chỉnh sửa thông tin</h6>
 
 						<form @submit.prevent="saveChanges">
 							<div class="row g-3">
@@ -127,6 +141,7 @@
 										v-model="form.DienThoai"
 										type="text"
 										class="form-control"
+										disabled
 									/>
 								</div>
 
@@ -177,15 +192,15 @@
 									@click="resetForm"
 									:disabled="saving"
 								>
-									Cancel
+									Hủy
 								</button>
 								<button
 									type="submit"
 									class="btn btn-dark btn-sm"
 									:disabled="saving"
 								>
-									<span v-if="saving">Saving...</span>
-									<span v-else>Save Changes</span>
+									<span v-if="saving">Đang lưu...</span>
+									<span v-else>Lưu thay đổi</span>
 								</button>
 							</div>
 						</form>
@@ -203,10 +218,10 @@
 					>
 						<div class="d-flex align-items-center mb-2">
 							<i class="fa-solid fa-book me-2"></i>
-							<span class="text-muted small">Books Borrowed</span>
+							<span class="text-muted small">Sách đã mượn</span>
 						</div>
 						<div class="fw-semibold">
-							{{ stats.totalBorrowed }} books
+							{{ stats.totalBorrowed }} cuốn
 						</div>
 					</div>
 				</div>
@@ -219,10 +234,10 @@
 					>
 						<div class="d-flex align-items-center mb-2">
 							<i class="fa-regular fa-heart me-2"></i>
-							<span class="text-muted small">Favorites</span>
+							<span class="text-muted small">Yêu thích</span>
 						</div>
 						<div class="fw-semibold">
-							{{ stats.favorites }} books
+							{{ stats.favorites }} cuốn
 						</div>
 					</div>
 				</div>
@@ -235,10 +250,10 @@
 					>
 						<div class="d-flex align-items-center mb-2">
 							<i class="fa-solid fa-clock-rotate-left me-2"></i>
-							<span class="text-muted small">Active Loans</span>
+							<span class="text-muted small">Đang mượn</span>
 						</div>
 						<div class="fw-semibold">
-							{{ stats.activeLoans }} books
+							{{ stats.activeLoans }} cuốn
 						</div>
 					</div>
 				</div>
@@ -284,9 +299,27 @@ export default {
 			if (!this.profile || !this.profile.createdAt) return "N/A";
 			const d = new Date(this.profile.createdAt);
 			if (Number.isNaN(d.getTime())) return "N/A";
-			return d.toLocaleString("en-US", {
+			return d.toLocaleString("vi-VN", {
 				month: "long",
 				year: "numeric",
+			});
+		},
+		isBanned() {
+			if (!this.profile || !this.profile.CamMuonDen) return false;
+			const banDate = new Date(this.profile.CamMuonDen);
+			const now = new Date();
+			return banDate > now;
+		},
+		banDateText() {
+			if (!this.profile || !this.profile.CamMuonDen) return "";
+			const d = new Date(this.profile.CamMuonDen);
+			if (Number.isNaN(d.getTime())) return "";
+			return d.toLocaleString("vi-VN", {
+				day: "2-digit",
+				month: "2-digit",
+				year: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
 			});
 		},
 	},

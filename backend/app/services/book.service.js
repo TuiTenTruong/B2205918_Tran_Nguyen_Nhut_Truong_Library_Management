@@ -4,7 +4,7 @@ const ApiError = require("../api-error");
 class BookService {
 	// Tạo sách mới
 	async createBook(bookData, file) {
-		const { TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, NguonGoc_TacGia } =
+		const { TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, NguonGoc_TacGia, MoTa } =
 			bookData;
 
 		const newBook = new Sach({
@@ -14,6 +14,7 @@ class BookService {
 			NamXuatBan,
 			MaNXB,
 			NguonGoc_TacGia,
+			MoTa,
 			AnhBia: file ? file.filename : undefined,
 		});
 
@@ -59,7 +60,7 @@ class BookService {
 			throw new ApiError(404, "Không tìm thấy sách");
 		}
 
-		const { TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, NguonGoc_TacGia } =
+		const { TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, NguonGoc_TacGia, MoTa } =
 			bookData;
 
 		if (TenSach) book.TenSach = TenSach;
@@ -68,6 +69,7 @@ class BookService {
 		if (NamXuatBan) book.NamXuatBan = NamXuatBan;
 		if (MaNXB) book.MaNXB = MaNXB;
 		if (NguonGoc_TacGia) book.NguonGoc_TacGia = NguonGoc_TacGia;
+		if (MoTa) book.MoTa = MoTa;
 		if (file) book.AnhBia = file.filename;
 
 		await book.save();

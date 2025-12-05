@@ -1,41 +1,49 @@
 <template>
+	<!-- …card nội dung… -->
+
 	<div class="card book-card h-100 shadow-sm">
-		<div class="position-relative overflow-hidden book-card__image-wrapper">
-			<img
-				:src="coverUrl"
-				:alt="book.TenSach"
-				class="card-img-top book-card__image"
-			/>
-
+		<RouterLink
+			:to="{ name: 'book-detail', params: { id: book.MaSach } }"
+			class="text-decoration-none"
+		>
 			<div
-				class="position-absolute top-0 end-0 d-flex gap-1 p-2 align-items-center"
+				class="position-relative overflow-hidden book-card__image-wrapper"
 			>
-				<span class="small text-danger ms-1 fw-bold">
-					{{ book.YeuThich || 0 }}
-				</span>
-				<button
-					class="book-card__icon-btn"
-					:class="{
-						'book-card__icon-love--active': book._isLikedByMe,
-					}"
-					@click.stop="$emit('toggle-favorite', book)"
+				<img
+					:src="coverUrl"
+					:alt="book.TenSach"
+					class="card-img-top book-card__image"
+				/>
+
+				<div
+					class="position-absolute top-0 end-0 d-flex gap-1 p-2 align-items-center"
 				>
-					<i class="fa-solid fa-heart"></i>
-				</button>
+					<span class="small text-danger ms-1 fw-bold">
+						{{ book.YeuThich || 0 }}
+					</span>
+					<button
+						class="book-card__icon-btn"
+						:class="{
+							'book-card__icon-love--active': book._isLikedByMe,
+						}"
+						@click.stop.prevent="$emit('toggle-favorite', book)"
+					>
+						<i class="fa-solid fa-heart"></i>
+					</button>
+				</div>
+
+				<span
+					class="badge position-absolute bottom-0 end-0 m-2"
+					:class="
+						book.SoQuyen > 0
+							? 'bg-success-subtle text-success-emphasis'
+							: 'bg-danger-subtle text-danger-emphasis'
+					"
+				>
+					{{ book.SoQuyen > 0 ? "Còn sách" : "Hết sách" }}
+				</span>
 			</div>
-
-			<span
-				class="badge position-absolute bottom-0 end-0 m-2"
-				:class="
-					book.SoQuyen > 0
-						? 'bg-success-subtle text-success-emphasis'
-						: 'bg-danger-subtle text-danger-emphasis'
-				"
-			>
-				{{ book.SoQuyen > 0 ? "Available" : "Out of stock" }}
-			</span>
-		</div>
-
+		</RouterLink>
 		<div class="card-body d-flex flex-column">
 			<h6 class="card-title mb-1 book-card__title flex-grow-1">
 				{{ book.TenSach }}
@@ -50,7 +58,7 @@
 				@click.stop="$emit('borrow', book)"
 				:disabled="book.SoQuyen <= 0"
 			>
-				Borrow Book
+				Mượn sách
 			</button>
 		</div>
 	</div>

@@ -107,6 +107,50 @@ class ReaderService {
 
 		return reader;
 	}
+
+	async updateReaderByAdmin(MaDocGia, updateData) {
+		const {
+			HoLot,
+			Ten,
+			NgaySinh,
+			Phai,
+			DiaChi,
+			DienThoai,
+			CamMuonDen,
+			TienPhatChuaDong,
+		} = updateData;
+
+		const updateFields = {
+			HoLot,
+			Ten,
+			NgaySinh,
+			Phai,
+			DiaChi,
+			DienThoai,
+		};
+
+		// Admin có thể cập nhật CamMuonDen
+		if (CamMuonDen !== undefined) {
+			updateFields.CamMuonDen = CamMuonDen ? new Date(CamMuonDen) : null;
+		}
+
+		// Admin có thể cập nhật TienPhatChuaDong
+		if (TienPhatChuaDong !== undefined) {
+			updateFields.TienPhatChuaDong = Number(TienPhatChuaDong) || 0;
+		}
+
+		const reader = await DocGia.findOneAndUpdate(
+			{ MaDocGia },
+			updateFields,
+			{ new: true, runValidators: true }
+		).select("-MatKhau");
+
+		if (!reader) {
+			throw new Error("Không tìm thấy người dùng");
+		}
+
+		return reader;
+	}
 	async deleteReader(MaDocGia) {
 		const reader = await DocGia.findOneAndUpdate(
 			{ MaDocGia },
@@ -129,7 +173,9 @@ class ReaderService {
 		if (search) {
 			query.$or = [
 				{ Ten: { $regex: search, $options: "i" } },
+				{ HoLot: { $regex: search, $options: "i" } },
 				{ Email: { $regex: search, $options: "i" } },
+				{ MaDocGia: { $regex: search, $options: "i" } },
 			];
 		}
 

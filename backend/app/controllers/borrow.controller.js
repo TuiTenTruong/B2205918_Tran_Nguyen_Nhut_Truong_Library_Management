@@ -41,7 +41,11 @@ exports.borrowSelf = async (req, res) => {
 
 exports.createBorrow = async (req, res) => {
 	try {
-		const result = await borrowService.createBorrow(req.body);
+		const fromReservation = req.body.fromReservation || false;
+		const result = await borrowService.createBorrow(
+			req.body,
+			fromReservation
+		);
 		return res.status(201).json({
 			success: true,
 			message: "Tạo phiếu mượn sách thành công",
@@ -304,6 +308,59 @@ exports.getBorrowStatistics = async (req, res) => {
 		return res.status(500).json({
 			success: false,
 			message: "Lỗi lấy thống kê mượn sách",
+			error: error.message,
+		});
+	}
+};
+
+// Gia hạn sách (User tự gia hạn)
+exports.renewBorrowSelf = async (req, res) => {
+	try {
+		const MaDocGia = req.userId;
+		const MaPhieuMuon = req.params.id;
+
+		const result = await borrowService.renewBorrow(MaPhieuMuon, MaDocGia);
+
+		return res.status(200).json({
+			success: true,
+			message: "Gia hạn sách thành công",
+			data: result,
+		});
+	} catch (error) {
+		if (error.statusCode) {
+			return res
+				.status(error.statusCode)
+				.json({ success: false, message: error.message });
+		}
+		return res.status(500).json({
+			success: false,
+			message: "Lỗi gia hạn sách",
+			error: error.message,
+		});
+	}
+};
+
+// Gia hạn sách (Admin)
+exports.renewBorrowAdmin = async (req, res) => {
+	try {
+		const MaPhieuMuon = req.params.id;
+
+		const result = await borrowService.renewBorrow(MaPhieuMuon);
+
+		return res.status(200).json({
+			success: true,
+			message: "Gia hạn sách thành công",
+			data: result,
+		});
+	} catch (error) {
+		if (error.statusCode) {
+			return res
+				.status(error.statusCode)
+				.json({ success: false, message: error.message });
+		}
+		return res.status(500).json({
+			success: false,
+			message: "Lỗi gia hạn sách",
 			error: error.message,
 		});
 	}

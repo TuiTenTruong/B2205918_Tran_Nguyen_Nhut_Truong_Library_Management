@@ -26,10 +26,14 @@ router.get(
 );
 router.get("/book/:bookId", authenticate, borrowController.getBorrowsByBook);
 router.post("/self", authenticate, borrowController.borrowSelf);
+// User tự gia hạn sách
+router.put("/:id/renew", authenticate, borrowController.renewBorrowSelf);
 // Routes yêu cầu xác thực admin
 router.post("/", authenticate, isAdmin, borrowController.createBorrow);
 router.put("/:id/return", authenticate, isAdmin, borrowController.returnBook);
 router.put("/:id/pay-fine", authenticate, isAdmin, borrowController.payFine);
+// Admin gia hạn sách
+router.put("/:id/renew-admin", authenticate, isAdmin, borrowController.renewBorrowAdmin);
 router.put(
 	"/reader/:readerId/pay-fine",
 	authenticate,

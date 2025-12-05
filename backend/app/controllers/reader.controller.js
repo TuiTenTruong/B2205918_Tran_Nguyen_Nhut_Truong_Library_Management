@@ -138,6 +138,26 @@ exports.getAllReaders = async (req, res) => {
 		});
 	}
 };
+
+exports.updateReaderByAdmin = async (req, res) => {
+	try {
+		const reader = await readerService.updateReaderByAdmin(
+			req.params.id,
+			req.body
+		);
+
+		res.status(200).json({
+			success: true,
+			message: "Cập nhật thành công",
+			data: reader,
+		});
+	} catch (error) {
+		res.status(400).json({
+			success: false,
+			message: error.message,
+		});
+	}
+};
 exports.toggleFavoriteBook = async (req, res) => {
 	try {
 		const MaDocGia = req.userId;

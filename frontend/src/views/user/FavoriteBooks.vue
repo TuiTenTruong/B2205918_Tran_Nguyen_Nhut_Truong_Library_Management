@@ -2,8 +2,8 @@
 	<div class="page">
 		<div class="page__header">
 			<div class="page__heading">
-				<h1 class="page__title">Favorite Books</h1>
-				<p class="page__subtitle">Your collection of favorite books</p>
+				<h1 class="page__title">Sách yêu thích</h1>
+				<p class="page__subtitle">Bộ sưu tập sách yêu thích của bạn</p>
 			</div>
 
 			<div class="favorite-summary" v-if="!isLoading">
@@ -11,7 +11,7 @@
 					class="fa-solid fa-heart favorite-summary__icon text-danger"
 				></i>
 				<span class="favorite-summary__text">
-					{{ totalFavorites }} favorites
+					{{ totalFavorites }} cuốn
 				</span>
 			</div>
 		</div>
@@ -40,6 +40,73 @@
 				/>
 			</div>
 		</div>
+		<div
+			v-if="showBorrowModal && selectedBook"
+			class="borrow-modal-backdrop"
+		>
+			<div class="borrow-modal">
+				<h5 class="borrow-modal__title">Xác nhận mượn sách</h5>
+
+				<div class="borrow-modal__body">
+					<div class="mb-2">
+						<div class="small text-muted">Tên sách</div>
+						<div class="fw-semibold">
+							{{ selectedBook.TenSach }}
+						</div>
+					</div>
+
+					<div class="mb-2">
+						<div class="small text-muted">Tác giả</div>
+						<div>{{ selectedBook.NguonGoc_TacGia }}</div>
+					</div>
+
+					<div class="mb-2 d-flex gap-3">
+						<div>
+							<div class="small text-muted">Mã sách</div>
+							<div>{{ selectedBook.MaSach }}</div>
+						</div>
+						<div>
+							<div class="small text-muted">Số quyển còn</div>
+							<div>{{ selectedBook.SoQuyen }}</div>
+						</div>
+					</div>
+
+					<div class="mt-3">
+						<label class="form-label small fw-semibold">
+							Chọn ngày trả (tối đa 14 ngày)
+						</label>
+						<input
+							v-model="borrowDate"
+							type="date"
+							class="form-control"
+							:min="borrowMinDate"
+							:max="borrowMaxDate"
+						/>
+						<div class="form-text">
+							Từ {{ borrowMinDate }} đến {{ borrowMaxDate }}
+						</div>
+					</div>
+				</div>
+
+				<div class="borrow-modal__footer">
+					<button
+						type="button"
+						class="btn btn-light btn-sm"
+						@click="closeBorrowModal"
+					>
+						Hủy
+					</button>
+					<button
+						type="button"
+						class="btn btn-primary btn-sm"
+						:disabled="!borrowDate"
+						@click="confirmBorrow"
+					>
+						Xác nhận mượn
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -47,6 +114,7 @@
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import ReaderService from "@/services/reader.service";
+import BorrowService from "@/services/borrow.service";
 import BookCard from "@/components/BookCard.vue";
 
 export default {
@@ -58,11 +126,24 @@ export default {
 		return {
 			favoriteBooks: [],
 			isLoading: false,
+			showBorrowModal: false,
+			selectedBook: null,
+			borrowDate: "",
 		};
 	},
 	computed: {
 		totalFavorites() {
 			return this.favoriteBooks.length;
+		},
+		borrowMinDate() {
+			const d = new Date();
+			d.setDate(d.getDate() + 1);
+			return this.formatDateForInput(d);
+		},
+		borrowMaxDate() {
+			const d = new Date();
+			d.setDate(d.getDate() + 14);
+			return this.formatDateForInput(d);
 		},
 	},
 	created() {
@@ -107,8 +188,65 @@ export default {
 
 		// Hàm xử lý mượn sách từ trang yêu thích
 		handleBorrowBook(book) {
-			console.log("Borrow from favorite page:", book);
-			toast.info("Chức năng mượn sách sẽ được cập nhật sau");
+			if (!this.requireLogin()) return;
+
+			if (book.SoQuyen <= 0) {
+				toast.warn("Sách hiện đã hết, không thể mượn.");
+				return;
+			}
+
+			this.selectedBook = book;
+			this.borrowDate = this.borrowMaxDate;
+			this.showBorrowModal = true;
+		},
+		requireLogin() {
+			const token = localStorage.getItem("readerToken");
+			if (!token) {
+				toast.info("Vui lòng đăng nhập để sử dụng chức năng này.");
+				this.$router.push({
+					path: "/auth",
+					query: { mode: "login" },
+				});
+				return false;
+			}
+			return true;
+		},
+		formatDateForInput(date) {
+			const y = date.getFullYear();
+			const m = String(date.getMonth() + 1).padStart(2, "0");
+			const d = String(date.getDate()).padStart(2, "0");
+			return `${y}-${m}-${d}`;
+		},
+		closeBorrowModal() {
+			this.showBorrowModal = false;
+			this.selectedBook = null;
+			this.borrowDate = "";
+		},
+		async confirmBorrow() {
+			if (!this.requireLogin()) return;
+			if (!this.selectedBook || !this.borrowDate) return;
+
+			try {
+				const res = await BorrowService.borrowSelf(
+					this.selectedBook.MaSach,
+					this.borrowDate
+				);
+
+				if (!res.success) {
+					toast.error(res.message || "Không thể mượn sách.");
+					return;
+				}
+
+				toast.success(res.message || "Mượn sách thành công.");
+				this.closeBorrowModal();
+				await this.loadFavorites();
+			} catch (error) {
+				console.error("Lỗi mượn sách:", error);
+				const message =
+					error?.response?.data?.message ||
+					"Có lỗi xảy ra khi mượn sách.";
+				toast.error(message);
+			}
 		},
 	},
 };
@@ -206,5 +344,42 @@ export default {
 		flex-direction: column;
 		align-items: flex-start;
 	}
+}
+
+.borrow-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.55);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1050;
+}
+
+.borrow-modal {
+	width: 100%;
+	max-width: 420px;
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+	padding: 16px 18px 14px;
+}
+
+.borrow-modal__title {
+	font-size: 16px;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.borrow-modal__body {
+	font-size: 14px;
+	color: #374151;
+}
+
+.borrow-modal__footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 16px;
 }
 </style>

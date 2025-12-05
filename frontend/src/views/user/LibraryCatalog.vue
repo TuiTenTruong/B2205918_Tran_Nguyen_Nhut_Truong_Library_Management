@@ -1,9 +1,10 @@
 <template>
 	<div class="library-page">
 		<div class="mb-3">
-			<h1 class="h4 mb-1 fw-semibold">Library Catalog</h1>
+			<h1 class="h4 mb-1 fw-semibold">Danh mục thư viện</h1>
 			<p class="small text-muted mb-0" v-if="!searchTerm">
-				Browse our collection or use the search to find what you need.
+				Duyệt qua bộ sưu tập của chúng tôi hoặc sử dụng tìm kiếm để tìm
+				những gì bạn cần.
 			</p>
 		</div>
 
@@ -13,7 +14,7 @@
 				<!-- Search box -->
 				<div class="col-12 col-lg-6">
 					<label class="form-label mb-1 small text-muted"
-						>Search</label
+						>Tìm kiếm</label
 					>
 					<div class="input-group">
 						<span class="input-group-text">
@@ -23,18 +24,18 @@
 							type="text"
 							class="form-control"
 							v-model.lazy="searchTerm"
-							placeholder="Search by title, accession number, or category..."
+							placeholder="Tìm theo tên sách, mã sách, hoặc danh mục..."
 						/>
 					</div>
 					<small class="text-muted d-block mt-1">
-						Found {{ filteredBooks.length }} books.
+						Tìm thấy {{ filteredBooks.length }} cuốn sách.
 					</small>
 				</div>
 
 				<!-- Status -->
 				<div class="col-12 col-sm-6 col-lg-6">
 					<label class="form-label mb-1 small text-muted"
-						>Status</label
+						>Trạng thái</label
 					>
 					<select
 						class="form-select form-select-sm"
@@ -52,8 +53,8 @@
 		<section>
 			<div class="row g-3 w-100">
 				<div
-					v-if="filteredBooks.length > 0"
-					v-for="book in filteredBooks"
+					v-if="paginatedBooks.length > 0"
+					v-for="book in paginatedBooks"
 					:key="book.MaSach"
 					:class="['col-6 col-md-4', 'col-lg-3']"
 				>
@@ -64,8 +65,52 @@
 					/>
 				</div>
 				<div v-else class="col-12 text-center text-muted">
-					<p>No books found. Try a different search term.</p>
+					<p>
+						Không tìm thấy sách nào. Hãy thử từ khóa tìm kiếm khác.
+					</p>
 				</div>
+			</div>
+
+			<!-- Pagination -->
+			<div v-if="totalPages > 1" class="d-flex justify-content-end mt-4">
+				<nav>
+					<ul class="pagination pagination-sm mb-0">
+						<li
+							class="page-item"
+							:class="{ disabled: currentPage === 1 }"
+						>
+							<button
+								class="page-link"
+								@click="goToPage(currentPage - 1)"
+								:disabled="currentPage === 1"
+							>
+								<i class="fa-solid fa-chevron-left"></i>
+							</button>
+						</li>
+						<li
+							v-for="page in visiblePages"
+							:key="page"
+							class="page-item"
+							:class="{ active: currentPage === page }"
+						>
+							<button class="page-link" @click="goToPage(page)">
+								{{ page }}
+							</button>
+						</li>
+						<li
+							class="page-item"
+							:class="{ disabled: currentPage === totalPages }"
+						>
+							<button
+								class="page-link"
+								@click="goToPage(currentPage + 1)"
+								:disabled="currentPage === totalPages"
+							>
+								<i class="fa-solid fa-chevron-right"></i>
+							</button>
+						</li>
+					</ul>
+				</nav>
 			</div>
 		</section>
 	</div>
@@ -151,11 +196,9 @@ export default {
 			showBorrowModal: false,
 			selectedBook: null,
 			borrowDate: "",
+			currentPage: 1,
+			itemsPerPage: 12,
 		};
-	},
-	async created() {
-		await this.fetchMyFavoriteIds();
-		await this.fetchBooks();
 	},
 	computed: {
 		filteredBooks() {
@@ -169,8 +212,18 @@ export default {
 				return true;
 			});
 		},
+		paginatedBooks() {
+			const start = (this.currentPage - 1) * this.itemsPerPage;
+			const end = start + this.itemsPerPage;
+			return this.filteredBooks.slice(start, end);
+		},
+		totalPages() {
+			return Math.ceil(this.filteredBooks.length / this.itemsPerPage);
+		},
 		borrowMinDate() {
-			return this.formatDateForInput(new Date());
+			const d = new Date();
+			d.setDate(d.getDate() + 1);
+			return this.formatDateForInput(d);
 		},
 		// Hàm lấy ngày tối đa (14 ngày kể từ hôm nay)
 		borrowMaxDate() {
@@ -178,9 +231,35 @@ export default {
 			d.setDate(d.getDate() + 14);
 			return this.formatDateForInput(d);
 		},
+		visiblePages() {
+			const pages = [];
+			const maxVisible = 5;
+			let start = Math.max(
+				1,
+				this.currentPage - Math.floor(maxVisible / 2)
+			);
+			let end = Math.min(this.totalPages, start + maxVisible - 1);
+
+			if (end - start < maxVisible - 1) {
+				start = Math.max(1, end - maxVisible + 1);
+			}
+
+			for (let i = start; i <= end; i++) {
+				pages.push(i);
+			}
+			return pages;
+		},
 	},
 	created() {
 		this.initData();
+	},
+	mounted() {
+		// Cập nhật lại trạng thái yêu thích từ localStorage khi mount
+		this.syncFavoritesFromLocal();
+	},
+	activated() {
+		// Cập nhật lại trạng thái yêu thích khi component được kích hoạt lại
+		this.syncFavoritesFromLocal();
 	},
 	methods: {
 		async initData() {
@@ -205,6 +284,21 @@ export default {
 			const d = String(date.getDate()).padStart(2, "0");
 			return `${y}-${m}-${d}`;
 		},
+		syncFavoritesFromLocal() {
+			// Đồng bộ trạng thái yêu thích từ localStorage
+			const favoriteBooks = JSON.parse(
+				localStorage.getItem("favoriteBooks") || "[]"
+			);
+			const favoriteSet = new Set(favoriteBooks);
+
+			// Cập nhật lại _isLikedByMe cho các books hiện tại
+			this.books.forEach((book) => {
+				book._isLikedByMe = favoriteSet.has(book.MaSach);
+			});
+
+			// Cập nhật myFavoriteIds để đồng bộ với localStorage
+			this.myFavoriteIds = favoriteBooks;
+		},
 		async fetchMyFavoriteIds() {
 			try {
 				const res = await ReaderService.getMyProfile();
@@ -214,6 +308,11 @@ export default {
 					Array.isArray(res.data.YeuThichSach)
 				) {
 					this.myFavoriteIds = res.data.YeuThichSach;
+					// Đồng bộ vào localStorage
+					localStorage.setItem(
+						"favoriteBooks",
+						JSON.stringify(this.myFavoriteIds)
+					);
 				} else {
 					this.myFavoriteIds = [];
 				}
@@ -253,6 +352,34 @@ export default {
 				if (res.success) {
 					book._isLikedByMe = res.data.isLiked;
 					book.YeuThich = res.data.likes;
+
+					// Cập nhật localStorage để đồng bộ
+					let favoriteList = [];
+					try {
+						const raw = localStorage.getItem("favoriteBooks");
+						if (raw) {
+							const parsed = JSON.parse(raw);
+							if (Array.isArray(parsed)) favoriteList = parsed;
+						}
+					} catch (e) {}
+
+					if (res.data.isLiked) {
+						if (!favoriteList.includes(book.MaSach)) {
+							favoriteList.push(book.MaSach);
+						}
+					} else {
+						favoriteList = favoriteList.filter(
+							(id) => id !== book.MaSach
+						);
+					}
+					localStorage.setItem(
+						"favoriteBooks",
+						JSON.stringify(favoriteList)
+					);
+
+					// Cập nhật myFavoriteIds để đồng bộ
+					this.myFavoriteIds = favoriteList;
+
 					toast.success(
 						res.data.isLiked
 							? "Đã thêm vào danh sách yêu thích."
@@ -277,7 +404,7 @@ export default {
 			}
 
 			this.selectedBook = book;
-			this.borrowDate = this.borrowMinDate;
+			this.borrowDate = this.borrowMaxDate;
 			this.showBorrowModal = true;
 		},
 		closeBorrowModal() {
@@ -311,10 +438,20 @@ export default {
 				toast.error(message);
 			}
 		},
+		goToPage(page) {
+			if (page >= 1 && page <= this.totalPages) {
+				this.currentPage = page;
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			}
+		},
 	},
 	watch: {
 		searchTerm(newVal) {
+			this.currentPage = 1;
 			this.fetchBooks(newVal);
+		},
+		selectedStatus() {
+			this.currentPage = 1;
 		},
 	},
 };
@@ -355,5 +492,39 @@ export default {
 	justify-content: flex-end;
 	gap: 8px;
 	margin-top: 16px;
+}
+
+/* Pagination */
+.pagination {
+	gap: 4px;
+}
+
+.page-link {
+	border-radius: 6px;
+	border: 1px solid #e5e7eb;
+	color: #374151;
+	min-width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8px;
+}
+
+.page-link:hover:not(:disabled) {
+	background-color: #f3f4f6;
+	border-color: #d1d5db;
+	color: #111827;
+}
+
+.page-item.active .page-link {
+	background-color: #2563eb;
+	border-color: #2563eb;
+	color: white;
+}
+
+.page-item.disabled .page-link {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 </style>
